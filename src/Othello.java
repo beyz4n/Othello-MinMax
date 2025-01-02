@@ -8,9 +8,35 @@ public class Othello {
 
 
     public static void main(String[] args) {
+
+
+        // Take the board size from the user
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("For human player vs human player enter 1,\n" + //
+                        "For human player vs AI player enter 2,\n" + //
+                        "For AI player vs AI player enter 3 :");
+        int gameMethod = scanner.nextInt();
+
+
+        if (gameMethod == 1) {
+            humanVsHuman();
+        } else if (gameMethod == 2) {
+           //humanVsAI();
+        } else if (gameMethod == 3) {
+            // AIvsAI();
+        } else {
+            System.out.println("Invalid input. Try again.");
+        }
+         
+
+
+       
+    }
+
+    public static void humanVsHuman() {
+
         initializeBoard();
         printBoard();
-
 
         Scanner scanner = new Scanner(System.in);
         while (true) {
@@ -163,6 +189,8 @@ public class Othello {
         }
         return true;
     }
+
+    
 
 
 
