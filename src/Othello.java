@@ -57,7 +57,7 @@ public class Othello {
 
         Scanner scanner = new Scanner(System.in);
         System.out.println("Select heuristic for AI (enter h1, h2 or h3): ");
-        String heuristic = scanner.nextLine();
+        heuristic = scanner.nextLine();
 
         if (heuristic.equals("h1")) {
             heuristic = "h1";            
@@ -69,6 +69,7 @@ public class Othello {
         else {
             System.out.println("Invalid input. Try again.");
         }
+
 
 
         while (true) {
@@ -117,6 +118,18 @@ public class Othello {
     }
 
     public static void printBoard() {
+        System.out.print("  a b c d e f g h\n");
+        for (int i = 0; i < SIZE; i++) {
+            System.out.print((i + 1) + " ");
+            for (int j = 0; j < SIZE; j++) {
+                System.out.print(board[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+
+
+    public static void printBoard2( char[][] board) {
         System.out.print("  a b c d e f g h\n");
         for (int i = 0; i < SIZE; i++) {
             System.out.print((i + 1) + " ");
@@ -197,6 +210,45 @@ public class Othello {
         }
         return true; 
     }
+
+
+    // public static boolean isGameOver() {
+    //     boolean hasMoveForX = false;
+    //     boolean hasMoveForO = false;
+    
+    //     // Check: Is there a valid move for player X?
+    //     char tempPlayer = currentPlayer; // Temporarily store the current player
+    //     currentPlayer = 'X';
+    //     for (int i = 0; i < SIZE; i++) {
+    //         for (int j = 0; j < SIZE; j++) {
+    //             if (isValidMove(i, j)) {
+    //                 hasMoveForX = true;
+    //                 break; // Exit the loop if a valid move is found
+    //             }
+    //         }
+    //         if (hasMoveForX) break; // No need to continue checking if a move is found
+    //     }
+    
+    //     // Check: Is there a valid move for player O?
+    //     currentPlayer = 'O';
+    //     for (int i = 0; i < SIZE; i++) {
+    //         for (int j = 0; j < SIZE; j++) {
+    //             if (isValidMove(i, j)) {
+    //                 hasMoveForO = true;
+    //                 break; // Exit the loop if a valid move is found
+    //             }
+    //         }
+    //         if (hasMoveForO) break; // No need to continue checking if a move is found
+    //     }
+    
+    //     // Restore the original current player
+    //     currentPlayer = tempPlayer;
+    
+    //     // If neither player has a valid move, the game is over
+    //     return !(hasMoveForX || hasMoveForO);
+    // }
+    
+    
     
 
     public static int[] alphaBetaSearch(char[][] state) {
@@ -204,12 +256,15 @@ public class Othello {
         int[] bestAction = null;
         int alpha = Integer.MIN_VALUE;
         int beta = Integer.MAX_VALUE;
-        int depth = 5; // Maximum depth to search
+        int depth = 8; // Maximum depth to search
     
         for (int[] action : actions(state)) {
             char[][] newState = result(state, action);
+            System.out.println("Action: " + action[0] + " " + action[1]);
+            printBoard2(newState);
             int value = minValue(newState, alpha, beta, depth - 1);
             if (value > bestValue) {
+                System.out.println("Beta pruning applied at depth=" + depth);
                 bestValue = value;
                 bestAction = action;
             }
@@ -218,12 +273,19 @@ public class Othello {
     }
     
     public static int maxValue(char[][] state, int alpha, int beta, int depth) {
+        System.out.println("maxValue: depth=" + depth + ", alpha=" + alpha + ", beta=" + beta);
+        boolean isMaximazingPlayer = true;
         if (isTerminal(state) || depth == 0) {
+            System.out.println("Applying heuristic: depth=" + depth);
             if(heuristic.equals("h1")) {
+                System.out.println("h1 max");
                 return h1(state);
             }
             else if(heuristic.equals("h2")) {
-               // return h2(state);
+                System.out.println("hterm");
+                System.out.println("h2 max");
+                System.out.println("max");
+               return h2(state, isMaximazingPlayer, currentPlayer);
             }
             else if (heuristic.equals("h3")) {
               //  return h3(state);
@@ -235,6 +297,7 @@ public class Othello {
             char[][] newState = result(state, action);
             v = Math.max(v, minValue(newState, alpha, beta, depth - 1));
             if (v >= beta) {
+                System.out.println("Beta pruning applied at depth=" + depth);
                 return v; 
             }
             alpha = Math.max(alpha, v);
@@ -243,12 +306,19 @@ public class Othello {
     }
     
     public static int minValue(char[][] state, int alpha, int beta, int depth) {
+        System.out.println("minValue: depth=" + depth + ", alpha=" + alpha + ", beta=" + beta);
+        boolean isMaximazingPlayer = false;
+        
         if (isTerminal(state) || depth == 0) {
+            System.out.println("Applying heuristic: depth=" + depth);
             if(heuristic.equals("h1")) {
+                System.out.println("h1 min");
                 return h1(state);
             }
             else if(heuristic.equals("h2")) {
-               // return h2(state);
+                System.out.println("min");
+                System.out.println("h2 min");
+               return h2(state, isMaximazingPlayer, currentPlayer);
             }
             else if (heuristic.equals("h3")) {
               //  return h3(state);
@@ -268,7 +338,11 @@ public class Othello {
     
 
     public static boolean isTerminal(char[][] state) {
-        return isGameOver() || actions(state).isEmpty();
+
+        boolean terminal = isGameOver() || actions(state).isEmpty();
+        System.out.println("isTerminal: " + terminal);
+        return terminal;
+
     }
 
     public static int h1(char[][] state) {
@@ -287,17 +361,96 @@ public class Othello {
         return playerCount - opponentCount;
     }
 
+
+    public static int h2(char[][] state, boolean isMaximazingPlayer, char currentPlayer) {
+
+        int playedMoves = playedMovesCount(state);
+        int playerCount = 0, opponentCount = 0;
+        int opponentCountInSides = 0;
+        int currentCountInSides = 0;
+        char opponent = (currentPlayer == 'X') ? 'O' : 'X';
+
+
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if (state[i][j] == currentPlayer) {
+                    playerCount++;
+                } else if (state[i][j] == opponent) {
+                    opponentCount++;
+                }
+
+                if (i == 0 || i == SIZE - 1 || j == 0 || j == SIZE - 1 || i == 1 || i == SIZE - 2 || j == 1 ||j == SIZE -2 ) {
+
+                  if(playedMoves < 16) {
+                    
+                      if (state[i][j] == opponent) {
+                          opponentCountInSides += (isCorner(i, j) ? 3 : 2);
+                      } else if (state[i][j] == currentPlayer) {
+                          currentCountInSides += (isCorner(i, j) ? 4 : 2);
+                      }
+                  }
+                  else{
+                      if (state[i][j] == opponent) {
+                          opponentCountInSides += (isCorner(i, j) ? 4 : 2);
+                      } else if (state[i][j] == currentPlayer) {
+                          currentCountInSides += (isCorner(i, j) ? 10 : 2);
+                      }
+                  }
+
+                }
+            }
+        }
+
+
+        int baseValue = playerCount - opponentCount;
+        int h2Value = currentCountInSides - opponentCountInSides;
+
+        if (isMaximazingPlayer) {
+            return baseValue + h2Value;
+        } else {
+            System.out.println("I am minimizing player." + "value is:" + (baseValue + h2Value ));
+            System.out.println("baseValue" + baseValue);
+            System.out.println(playerCount);
+            System.out.println(opponentCount);
+            System.out.println(h2Value);
+            return -(baseValue + h2Value);
+        }
+    }
+
+    private static int playedMovesCount(char[][] state) {
+
+        int playedMoves = 0;
+
+        for(int i = 0; i< SIZE ; i++){
+            for(int j = 0 ; j < SIZE ; j++){
+                if(state[i][j] != '.' ){
+                    playedMoves++;
+                }
+            }
+        }
+       return playedMoves;
+    }
+
+    private static boolean isCorner(int i, int j) {
+        return (i == 0 && j == 0) || (i == 0 && j == SIZE - 1) || (i == SIZE - 1 && j == 0) || (i == SIZE - 1 && j == SIZE - 1);
+    }
+
+    
+
     public static List<int[]> actions(char[][] state) {
         List<int[]> validActions = new ArrayList<>();
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
                 if (state[i][j] == '.' && isValidMove(i, j)) {
                     validActions.add(new int[]{i, j});
+                    System.out.println("Valid action: " + i + ", " + j);
+
                 }
             }
         }
         return validActions;
     }
+    
     
 
     public static char[][] result(char[][] state, int[] action) {
