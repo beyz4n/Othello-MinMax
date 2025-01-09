@@ -7,7 +7,7 @@ public class Othello {
     static char[][] board = new char[SIZE][SIZE];
     static char currentPlayer = 'X';
     static String heuristic = "h1";
-    static int number_of_plies = 5; // default depth is 5
+    static int numberOfPlies = 5; // default depth is 5
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -91,7 +91,7 @@ public class Othello {
         while (true) {
             try {
                 System.out.println("Enter the number of plies: ");
-                number_of_plies = scanner.nextInt();
+                numberOfPlies = scanner.nextInt();
                 break;
             } catch (Exception e) {
                 System.out.println("Invalid input. Please enter a valid number between 1 and 8.");
@@ -123,7 +123,7 @@ public class Othello {
             } else {
                 // AI player
                 System.out.println("AI's turn.");
-                int[] bestAction = alphaBetaSearch(board, number_of_plies);
+                int[] bestAction = alphaBetaSearch(board, numberOfPlies);
                 makeMove(bestAction[0], bestAction[1]);
                 printBoard();
                 if (isGameOver())
@@ -179,7 +179,7 @@ public class Othello {
         while (true) {
             try {
                 System.out.println("Enter the number of plies: ");
-                number_of_plies = scanner.nextInt();
+                numberOfPlies = scanner.nextInt();
                 break;
             } catch (Exception e) {
                 System.out.println("Invalid input. Please enter a valid number between 1 and 8.");
@@ -194,7 +194,7 @@ public class Othello {
                 // AI Player 1's turn
                 // System.out.println("AI Player 1 (X)'s turn with heuristic: " + heuristicX);
                 heuristic = heuristicX; // Set heuristic for Player X
-                int[] bestAction = alphaBetaSearch(board, number_of_plies);
+                int[] bestAction = alphaBetaSearch(board, numberOfPlies);
                 makeMove(bestAction[0], bestAction[1]);
                 printBoard();
                 if (isGameOver())
@@ -204,7 +204,7 @@ public class Othello {
                 // AI Player 2's turn
                 // System.out.println("AI Player 2 (O)'s turn with heuristic: " + heuristicO);
                 heuristic = heuristicO; // Set heuristic for Player O
-                int[] bestAction = alphaBetaSearch(board, number_of_plies);
+                int[] bestAction = alphaBetaSearch(board, numberOfPlies);
                 makeMove(bestAction[0], bestAction[1]);
                 printBoard();
                 if (isGameOver())
@@ -388,12 +388,12 @@ public class Othello {
     // return !(hasMoveForX || hasMoveForO);
     // }
 
-    public static int[] alphaBetaSearch(char[][] state, int number_of_plies) {
+    public static int[] alphaBetaSearch(char[][] state, int numberOfPlies) {
         int bestValue = Integer.MIN_VALUE;
         int[] bestAction = null;
         int alpha = Integer.MIN_VALUE;
         int beta = Integer.MAX_VALUE;
-        int depth = number_of_plies; // Maximum depth to search
+        int depth = numberOfPlies; // Maximum depth to search
 
         for (int[] action : actions(state)) {
             char[][] newState = result(state, action);
