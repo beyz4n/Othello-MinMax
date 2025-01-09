@@ -192,7 +192,6 @@ public class Othello {
         while (true) {
             if (currentPlayer == 'X') {
                 // AI Player 1's turn
-                // System.out.println("AI Player 1 (X)'s turn with heuristic: " + heuristicX);
                 heuristic = heuristicX; // Set heuristic for Player X
                 int[] bestAction = alphaBetaSearch(board, numberOfPlies);
                 makeMove(bestAction[0], bestAction[1]);
@@ -202,7 +201,6 @@ public class Othello {
                 currentPlayer = 'O';
             } else {
                 // AI Player 2's turn
-                // System.out.println("AI Player 2 (O)'s turn with heuristic: " + heuristicO);
                 heuristic = heuristicO; // Set heuristic for Player O
                 int[] bestAction = alphaBetaSearch(board, numberOfPlies);
                 makeMove(bestAction[0], bestAction[1]);
@@ -352,42 +350,6 @@ public class Othello {
         return true;
     }
 
-    // public static boolean isGameOver() {
-    // boolean hasMoveForX = false;
-    // boolean hasMoveForO = false;
-
-    // // Check: Is there a valid move for player X?
-    // char tempPlayer = currentPlayer; // Temporarily store the current player
-    // currentPlayer = 'X';
-    // for (int i = 0; i < SIZE; i++) {
-    // for (int j = 0; j < SIZE; j++) {
-    // if (isValidMove(i, j)) {
-    // hasMoveForX = true;
-    // break; // Exit the loop if a valid move is found
-    // }
-    // }
-    // if (hasMoveForX) break; // No need to continue checking if a move is found
-    // }
-
-    // // Check: Is there a valid move for player O?
-    // currentPlayer = 'O';
-    // for (int i = 0; i < SIZE; i++) {
-    // for (int j = 0; j < SIZE; j++) {
-    // if (isValidMove(i, j)) {
-    // hasMoveForO = true;
-    // break; // Exit the loop if a valid move is found
-    // }
-    // }
-    // if (hasMoveForO) break; // No need to continue checking if a move is found
-    // }
-
-    // // Restore the original current player
-    // currentPlayer = tempPlayer;
-
-    // // If neither player has a valid move, the game is over
-    // return !(hasMoveForX || hasMoveForO);
-    // }
-
     public static int[] alphaBetaSearch(char[][] state, int numberOfPlies) {
         int bestValue = Integer.MIN_VALUE;
         int[] bestAction = null;
@@ -397,11 +359,9 @@ public class Othello {
 
         for (int[] action : actions(state)) {
             char[][] newState = result(state, action);
-            // System.out.println("Action: " + action[0] + " " + action[1]);
             printBoard2(newState);
             int value = minValue(newState, alpha, beta, depth - 1);
             if (value > bestValue) {
-                // System.out.println("Beta pruning applied at depth=" + depth);
                 bestValue = value;
                 bestAction = action;
             }
@@ -410,17 +370,11 @@ public class Othello {
     }
 
     public static int maxValue(char[][] state, int alpha, int beta, int depth) {
-        // System.out.println("maxValue: depth=" + depth + ", alpha=" + alpha + ", beta=" + beta);
         boolean isMaximazingPlayer = true;
         if (isTerminal(state) || depth == 0) {
-            // System.out.println("Applying heuristic: depth=" + depth);
             if (heuristic.equals("h1")) {
-                // System.out.println("h1 max");
                 return h1(state);
             } else if (heuristic.equals("h2")) {
-                // System.out.println("hterm");
-                // System.out.println("h2 max");
-                // System.out.println("max");
                 return h2(state, isMaximazingPlayer, currentPlayer);
             } else if (heuristic.equals("h3")) {
                 return h3(state, isMaximazingPlayer);
@@ -432,7 +386,6 @@ public class Othello {
             char[][] newState = result(state, action);
             v = Math.max(v, minValue(newState, alpha, beta, depth - 1));
             if (v >= beta) {
-                // System.out.println("Beta pruning applied at depth=" + depth);
                 return v;
             }
             alpha = Math.max(alpha, v);
@@ -441,17 +394,12 @@ public class Othello {
     }
 
     public static int minValue(char[][] state, int alpha, int beta, int depth) {
-        // System.out.println("minValue: depth=" + depth + ", alpha=" + alpha + ", beta=" + beta);
         boolean isMaximazingPlayer = false;
 
         if (isTerminal(state) || depth == 0) {
-            // System.out.println("Applying heuristic: depth=" + depth);
             if (heuristic.equals("h1")) {
-                // System.out.println("h1 min");
                 return h1(state);
             } else if (heuristic.equals("h2")) {
-                // System.out.println("min");
-                // System.out.println("h2 min");
                 return h2(state, isMaximazingPlayer, currentPlayer);
             } else if (heuristic.equals("h3")) {
                 return h3(state, isMaximazingPlayer);
@@ -472,7 +420,6 @@ public class Othello {
     public static boolean isTerminal(char[][] state) {
 
         boolean terminal = isGameOver() || actions(state).isEmpty();
-        // System.out.println("isTerminal: " + terminal);
         return terminal;
 
     }
@@ -537,11 +484,6 @@ public class Othello {
         if (isMaximazingPlayer) {
             return baseValue + h2Value;
         } else {
-            // System.out.println("I am minimizing player." + "value is:" + (baseValue + h2Value));
-            // System.out.println("baseValue" + baseValue);
-            // System.out.println(playerCount);
-            // System.out.println(opponentCount);
-            // System.out.println(h2Value);
             return -(baseValue + h2Value);
         }
     }
@@ -658,7 +600,6 @@ public class Othello {
             for (int j = 0; j < SIZE; j++) {
                 if (state[i][j] == '.' && isValidMove(i, j)) {
                     validActions.add(new int[] { i, j });
-                    // System.out.println("Valid action: " + i + ", " + j);
                 }
             }
         }
