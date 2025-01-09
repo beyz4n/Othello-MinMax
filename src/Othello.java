@@ -7,6 +7,7 @@ public class Othello {
     static char[][] board = new char[SIZE][SIZE];
     static char currentPlayer = 'X';
     static String heuristic = "h1";
+    static int number_of_plies = 5; // default depth is 5
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -19,6 +20,8 @@ public class Othello {
             humanVsHuman();
         } else if (gameMethod == 2) {
             humanVsAI();
+        } else if (gameMethod == 3) {
+            aiVsAI();
         } else {
             System.out.println("Invalid input. Try again.");
         }
@@ -41,14 +44,30 @@ public class Othello {
             if (isValidMove(row, col)) {
                 makeMove(row, col);
                 printBoard();
-                if (isGameOver()) break;
+                if (isGameOver())
+                    break;
                 currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
             } else {
                 System.out.println("Invalid move. Try again.");
             }
         }
 
+        // Game over, determine the winner
+        int countX = countStones('X');
+        int countO = countStones('O');
+    
         System.out.println("Game Over!");
+        System.out.println("Final Score: ");
+        System.out.println("Player X: " + countX);
+        System.out.println("Player O: " + countO);
+    
+        if (countX > countO) {
+            System.out.println("AI Player 1 (X) wins!");
+        } else if (countO > countX) {
+            System.out.println("AI Player 2 (O) wins!");
+        } else {
+            System.out.println("It's a draw!");
+        }
     }
 
     public static void humanVsAI() {
@@ -60,16 +79,25 @@ public class Othello {
         heuristic = scanner.nextLine();
 
         if (heuristic.equals("h1")) {
-            heuristic = "h1";            
+            heuristic = "h1";
         } else if (heuristic.equals("h2")) {
             heuristic = "h2";
         } else if (heuristic.equals("h3")) {
             heuristic = "h3";
-        }
-        else {
+        } else {
             System.out.println("Invalid input. Try again.");
         }
 
+        while (true) {
+            try {
+                System.out.println("Enter the number of plies: ");
+                number_of_plies = scanner.nextInt();
+                break;
+            } catch (Exception e) {
+                System.out.println("Invalid input. Please enter a valid number between 1 and 8.");
+                scanner.nextLine(); 
+            }
+        }
 
 
         while (true) {
@@ -86,7 +114,8 @@ public class Othello {
                 if (isValidMove(row, col)) {
                     makeMove(row, col);
                     printBoard();
-                    if (isGameOver()) break;
+                    if (isGameOver())
+                        break;
                     currentPlayer = 'O';
                 } else {
                     System.out.println("Invalid move. Try again.");
@@ -94,16 +123,127 @@ public class Othello {
             } else {
                 // AI player
                 System.out.println("AI's turn.");
-                int[] bestAction = alphaBetaSearch(board);
+                int[] bestAction = alphaBetaSearch(board, number_of_plies);
                 makeMove(bestAction[0], bestAction[1]);
                 printBoard();
-                if (isGameOver()) break;
+                if (isGameOver())
+                    break;
                 currentPlayer = 'X';
             }
         }
 
+        // Game over, determine the winner
+        int countX = countStones('X');
+        int countO = countStones('O');
+    
         System.out.println("Game Over!");
+        System.out.println("Final Score: ");
+        System.out.println("Player X: " + countX);
+        System.out.println("Player O: " + countO);
+    
+        if (countX > countO) {
+            System.out.println("AI Player 1 (X) wins!");
+        } else if (countO > countX) {
+            System.out.println("AI Player 2 (O) wins!");
+        } else {
+            System.out.println("It's a draw!");
+        }
     }
+
+    public static void aiVsAI() {
+        initializeBoard();
+        printBoard();
+    
+        Scanner scanner = new Scanner(System.in);
+    
+        // Select heuristic for AI Player 1 (X)
+        String heuristicX = "";
+        while (!heuristicX.equals("h1") && !heuristicX.equals("h2") && !heuristicX.equals("h3")) {
+            System.out.println("Select heuristic for AI Player 1 (X) (enter h1, h2, or h3): ");
+            heuristicX = scanner.nextLine();
+            if (!heuristicX.equals("h1") && !heuristicX.equals("h2") && !heuristicX.equals("h3")) {
+                System.out.println("Invalid input. Please enter h1, h2, or h3.");
+            }
+        }
+    
+        // Select heuristic for AI Player 2 (O)
+        String heuristicO = "";
+        while (!heuristicO.equals("h1") && !heuristicO.equals("h2") && !heuristicO.equals("h3")) {
+            System.out.println("Select heuristic for AI Player 2 (O) (enter h1, h2, or h3): ");
+            heuristicO = scanner.nextLine();
+            if (!heuristicO.equals("h1") && !heuristicO.equals("h2") && !heuristicO.equals("h3")) {
+                System.out.println("Invalid input. Please enter h1, h2, or h3.");
+            }
+        }
+
+        while (true) {
+            try {
+                System.out.println("Enter the number of plies: ");
+                number_of_plies = scanner.nextInt();
+                break;
+            } catch (Exception e) {
+                System.out.println("Invalid input. Please enter a valid number between 1 and 8.");
+                scanner.nextLine(); 
+            }
+        }
+
+
+    
+        while (true) {
+            if (currentPlayer == 'X') {
+                // AI Player 1's turn
+                // System.out.println("AI Player 1 (X)'s turn with heuristic: " + heuristicX);
+                heuristic = heuristicX; // Set heuristic for Player X
+                int[] bestAction = alphaBetaSearch(board, number_of_plies);
+                makeMove(bestAction[0], bestAction[1]);
+                printBoard();
+                if (isGameOver())
+                    break;
+                currentPlayer = 'O';
+            } else {
+                // AI Player 2's turn
+                // System.out.println("AI Player 2 (O)'s turn with heuristic: " + heuristicO);
+                heuristic = heuristicO; // Set heuristic for Player O
+                int[] bestAction = alphaBetaSearch(board, number_of_plies);
+                makeMove(bestAction[0], bestAction[1]);
+                printBoard();
+                if (isGameOver())
+                    break;
+                currentPlayer = 'X';
+            }
+        }
+    
+        // Game over, determine the winner
+        int countX = countStones('X');
+        int countO = countStones('O');
+    
+        System.out.println("Game Over!");
+        System.out.println("Final Score: ");
+        System.out.println("Player X: " + countX);
+        System.out.println("Player O: " + countO);
+    
+        if (countX > countO) {
+            System.out.println("AI Player 1 (X) wins! with heuristic: " + heuristicX);
+        } else if (countO > countX) {
+            System.out.println("AI Player 2 (O) wins! with heuristic: " + heuristicO);
+        } else {
+            System.out.println("It's a draw!");
+        }
+    }
+    
+    // Function to count stones of a specific player
+    public static int countStones(char player) {
+        int count = 0;
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if (board[i][j] == player) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+    
 
     public static void initializeBoard() {
         for (int i = 0; i < SIZE; i++) {
@@ -128,8 +268,7 @@ public class Othello {
         }
     }
 
-
-    public static void printBoard2( char[][] board) {
+    public static void printBoard2(char[][] board) {
         System.out.print("  a b c d e f g h\n");
         for (int i = 0; i < SIZE; i++) {
             System.out.print((i + 1) + " ");
@@ -147,7 +286,8 @@ public class Othello {
 
         for (int rowStep = -1; rowStep <= 1; rowStep++) {
             for (int colStep = -1; colStep <= 1; colStep++) {
-                if (rowStep == 0 && colStep == 0) continue;
+                if (rowStep == 0 && colStep == 0)
+                    continue;
                 if (isValidDirection(row, col, rowStep, colStep)) {
                     return true;
                 }
@@ -181,7 +321,8 @@ public class Othello {
         board[row][col] = currentPlayer;
         for (int rowStep = -1; rowStep <= 1; rowStep++) {
             for (int colStep = -1; colStep <= 1; colStep++) {
-                if (rowStep == 0 && colStep == 0) continue;
+                if (rowStep == 0 && colStep == 0)
+                    continue;
                 if (isValidDirection(row, col, rowStep, colStep)) {
                     flipPieces(row, col, rowStep, colStep);
                 }
@@ -204,124 +345,116 @@ public class Othello {
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
                 if (isValidMove(i, j)) {
-                    return false; 
+                    return false;
                 }
             }
         }
-        return true; 
+        return true;
     }
 
-
     // public static boolean isGameOver() {
-    //     boolean hasMoveForX = false;
-    //     boolean hasMoveForO = false;
-    
-    //     // Check: Is there a valid move for player X?
-    //     char tempPlayer = currentPlayer; // Temporarily store the current player
-    //     currentPlayer = 'X';
-    //     for (int i = 0; i < SIZE; i++) {
-    //         for (int j = 0; j < SIZE; j++) {
-    //             if (isValidMove(i, j)) {
-    //                 hasMoveForX = true;
-    //                 break; // Exit the loop if a valid move is found
-    //             }
-    //         }
-    //         if (hasMoveForX) break; // No need to continue checking if a move is found
-    //     }
-    
-    //     // Check: Is there a valid move for player O?
-    //     currentPlayer = 'O';
-    //     for (int i = 0; i < SIZE; i++) {
-    //         for (int j = 0; j < SIZE; j++) {
-    //             if (isValidMove(i, j)) {
-    //                 hasMoveForO = true;
-    //                 break; // Exit the loop if a valid move is found
-    //             }
-    //         }
-    //         if (hasMoveForO) break; // No need to continue checking if a move is found
-    //     }
-    
-    //     // Restore the original current player
-    //     currentPlayer = tempPlayer;
-    
-    //     // If neither player has a valid move, the game is over
-    //     return !(hasMoveForX || hasMoveForO);
-    // }
-    
-    
-    
+    // boolean hasMoveForX = false;
+    // boolean hasMoveForO = false;
 
-    public static int[] alphaBetaSearch(char[][] state) {
+    // // Check: Is there a valid move for player X?
+    // char tempPlayer = currentPlayer; // Temporarily store the current player
+    // currentPlayer = 'X';
+    // for (int i = 0; i < SIZE; i++) {
+    // for (int j = 0; j < SIZE; j++) {
+    // if (isValidMove(i, j)) {
+    // hasMoveForX = true;
+    // break; // Exit the loop if a valid move is found
+    // }
+    // }
+    // if (hasMoveForX) break; // No need to continue checking if a move is found
+    // }
+
+    // // Check: Is there a valid move for player O?
+    // currentPlayer = 'O';
+    // for (int i = 0; i < SIZE; i++) {
+    // for (int j = 0; j < SIZE; j++) {
+    // if (isValidMove(i, j)) {
+    // hasMoveForO = true;
+    // break; // Exit the loop if a valid move is found
+    // }
+    // }
+    // if (hasMoveForO) break; // No need to continue checking if a move is found
+    // }
+
+    // // Restore the original current player
+    // currentPlayer = tempPlayer;
+
+    // // If neither player has a valid move, the game is over
+    // return !(hasMoveForX || hasMoveForO);
+    // }
+
+    public static int[] alphaBetaSearch(char[][] state, int number_of_plies) {
         int bestValue = Integer.MIN_VALUE;
         int[] bestAction = null;
         int alpha = Integer.MIN_VALUE;
         int beta = Integer.MAX_VALUE;
-        int depth = 8; // Maximum depth to search
-    
+        int depth = number_of_plies; // Maximum depth to search
+
         for (int[] action : actions(state)) {
             char[][] newState = result(state, action);
-            System.out.println("Action: " + action[0] + " " + action[1]);
+            // System.out.println("Action: " + action[0] + " " + action[1]);
             printBoard2(newState);
             int value = minValue(newState, alpha, beta, depth - 1);
             if (value > bestValue) {
-                System.out.println("Beta pruning applied at depth=" + depth);
+                // System.out.println("Beta pruning applied at depth=" + depth);
                 bestValue = value;
                 bestAction = action;
             }
         }
         return bestAction;
     }
-    
+
     public static int maxValue(char[][] state, int alpha, int beta, int depth) {
-        System.out.println("maxValue: depth=" + depth + ", alpha=" + alpha + ", beta=" + beta);
+        // System.out.println("maxValue: depth=" + depth + ", alpha=" + alpha + ", beta=" + beta);
         boolean isMaximazingPlayer = true;
         if (isTerminal(state) || depth == 0) {
-            System.out.println("Applying heuristic: depth=" + depth);
-            if(heuristic.equals("h1")) {
-                System.out.println("h1 max");
+            // System.out.println("Applying heuristic: depth=" + depth);
+            if (heuristic.equals("h1")) {
+                // System.out.println("h1 max");
                 return h1(state);
+            } else if (heuristic.equals("h2")) {
+                // System.out.println("hterm");
+                // System.out.println("h2 max");
+                // System.out.println("max");
+                return h2(state, isMaximazingPlayer, currentPlayer);
+            } else if (heuristic.equals("h3")) {
+                return h3(state, isMaximazingPlayer);
             }
-            else if(heuristic.equals("h2")) {
-                System.out.println("hterm");
-                System.out.println("h2 max");
-                System.out.println("max");
-               return h2(state, isMaximazingPlayer, currentPlayer);
-            }
-            else if (heuristic.equals("h3")) {
-              //  return h3(state);
-            }
-           
+
         }
         int v = Integer.MIN_VALUE;
         for (int[] action : actions(state)) {
             char[][] newState = result(state, action);
             v = Math.max(v, minValue(newState, alpha, beta, depth - 1));
             if (v >= beta) {
-                System.out.println("Beta pruning applied at depth=" + depth);
-                return v; 
+                // System.out.println("Beta pruning applied at depth=" + depth);
+                return v;
             }
             alpha = Math.max(alpha, v);
         }
         return v;
     }
-    
+
     public static int minValue(char[][] state, int alpha, int beta, int depth) {
-        System.out.println("minValue: depth=" + depth + ", alpha=" + alpha + ", beta=" + beta);
+        // System.out.println("minValue: depth=" + depth + ", alpha=" + alpha + ", beta=" + beta);
         boolean isMaximazingPlayer = false;
-        
+
         if (isTerminal(state) || depth == 0) {
-            System.out.println("Applying heuristic: depth=" + depth);
-            if(heuristic.equals("h1")) {
-                System.out.println("h1 min");
+            // System.out.println("Applying heuristic: depth=" + depth);
+            if (heuristic.equals("h1")) {
+                // System.out.println("h1 min");
                 return h1(state);
-            }
-            else if(heuristic.equals("h2")) {
-                System.out.println("min");
-                System.out.println("h2 min");
-               return h2(state, isMaximazingPlayer, currentPlayer);
-            }
-            else if (heuristic.equals("h3")) {
-              //  return h3(state);
+            } else if (heuristic.equals("h2")) {
+                // System.out.println("min");
+                // System.out.println("h2 min");
+                return h2(state, isMaximazingPlayer, currentPlayer);
+            } else if (heuristic.equals("h3")) {
+                return h3(state, isMaximazingPlayer);
             }
         }
         int v = Integer.MAX_VALUE;
@@ -329,18 +462,17 @@ public class Othello {
             char[][] newState = result(state, action);
             v = Math.min(v, maxValue(newState, alpha, beta, depth - 1));
             if (v <= alpha) {
-                return v; 
+                return v;
             }
             beta = Math.min(beta, v);
         }
         return v;
     }
-    
 
     public static boolean isTerminal(char[][] state) {
 
         boolean terminal = isGameOver() || actions(state).isEmpty();
-        System.out.println("isTerminal: " + terminal);
+        // System.out.println("isTerminal: " + terminal);
         return terminal;
 
     }
@@ -361,7 +493,6 @@ public class Othello {
         return playerCount - opponentCount;
     }
 
-
     public static int h2(char[][] state, boolean isMaximazingPlayer, char currentPlayer) {
 
         int playedMoves = playedMovesCount(state);
@@ -369,7 +500,6 @@ public class Othello {
         int opponentCountInSides = 0;
         int currentCountInSides = 0;
         char opponent = (currentPlayer == 'X') ? 'O' : 'X';
-
 
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
@@ -379,28 +509,27 @@ public class Othello {
                     opponentCount++;
                 }
 
-                if (i == 0 || i == SIZE - 1 || j == 0 || j == SIZE - 1 || i == 1 || i == SIZE - 2 || j == 1 ||j == SIZE -2 ) {
+                if (i == 0 || i == SIZE - 1 || j == 0 || j == SIZE - 1 || i == 1 || i == SIZE - 2 || j == 1
+                        || j == SIZE - 2) {
 
-                  if(playedMoves < 16) {
-                    
-                      if (state[i][j] == opponent) {
-                          opponentCountInSides += (isCorner(i, j) ? 3 : 2);
-                      } else if (state[i][j] == currentPlayer) {
-                          currentCountInSides += (isCorner(i, j) ? 4 : 2);
-                      }
-                  }
-                  else{
-                      if (state[i][j] == opponent) {
-                          opponentCountInSides += (isCorner(i, j) ? 4 : 2);
-                      } else if (state[i][j] == currentPlayer) {
-                          currentCountInSides += (isCorner(i, j) ? 10 : 2);
-                      }
-                  }
+                    if (playedMoves < 16) {
+
+                        if (state[i][j] == opponent) {
+                            opponentCountInSides += (isCorner(i, j) ? 3 : 2);
+                        } else if (state[i][j] == currentPlayer) {
+                            currentCountInSides += (isCorner(i, j) ? 4 : 2);
+                        }
+                    } else {
+                        if (state[i][j] == opponent) {
+                            opponentCountInSides += (isCorner(i, j) ? 4 : 2);
+                        } else if (state[i][j] == currentPlayer) {
+                            currentCountInSides += (isCorner(i, j) ? 10 : 2);
+                        }
+                    }
 
                 }
             }
         }
-
 
         int baseValue = playerCount - opponentCount;
         int h2Value = currentCountInSides - opponentCountInSides;
@@ -408,11 +537,11 @@ public class Othello {
         if (isMaximazingPlayer) {
             return baseValue + h2Value;
         } else {
-            System.out.println("I am minimizing player." + "value is:" + (baseValue + h2Value ));
-            System.out.println("baseValue" + baseValue);
-            System.out.println(playerCount);
-            System.out.println(opponentCount);
-            System.out.println(h2Value);
+            // System.out.println("I am minimizing player." + "value is:" + (baseValue + h2Value));
+            // System.out.println("baseValue" + baseValue);
+            // System.out.println(playerCount);
+            // System.out.println(opponentCount);
+            // System.out.println(h2Value);
             return -(baseValue + h2Value);
         }
     }
@@ -421,37 +550,120 @@ public class Othello {
 
         int playedMoves = 0;
 
-        for(int i = 0; i< SIZE ; i++){
-            for(int j = 0 ; j < SIZE ; j++){
-                if(state[i][j] != '.' ){
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if (state[i][j] != '.') {
                     playedMoves++;
                 }
             }
         }
-       return playedMoves;
+        return playedMoves;
     }
 
     private static boolean isCorner(int i, int j) {
-        return (i == 0 && j == 0) || (i == 0 && j == SIZE - 1) || (i == SIZE - 1 && j == 0) || (i == SIZE - 1 && j == SIZE - 1);
+        return (i == 0 && j == 0) || (i == 0 && j == SIZE - 1) || (i == SIZE - 1 && j == 0)
+                || (i == SIZE - 1 && j == SIZE - 1);
     }
 
-    
+    public static int h3(char[][] state, boolean isMaximizingPlayer) {
+        int playedMoves = playedMovesCount(state);
+        int playerCount = 0, opponentCount = 0;
+        int h3Value = 0;
+        int opponentCountInSides = 0, currentCountInSides = 0;
+        char opponent = (currentPlayer == 'X') ? 'O' : 'X';
+
+        // Iterate through the board to calculate player stones and positional values
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if (state[i][j] == currentPlayer) {
+                    playerCount++; // Count current player's stones
+                } else if (state[i][j] == opponent) {
+                    opponentCount++; // Count opponent's stones
+                }
+
+                // Evaluate edge and corner positions
+                if (isEdgeOrCorner(i, j)) {
+                    if (playedMoves < 16) { // Early game
+                        if (state[i][j] == opponent) {
+                            opponentCountInSides += (isCorner(i, j) ? 3 : 2);
+                        } else if (state[i][j] == currentPlayer) {
+                            currentCountInSides += (isCorner(i, j) ? 4 : 2);
+                        }
+                    } else { // Late game
+                        if (state[i][j] == opponent) {
+                            opponentCountInSides += (isCorner(i, j) ? 4 : 2);
+                        } else if (state[i][j] == currentPlayer) {
+                            currentCountInSides += (isCorner(i, j) ? 10 : 2);
+                        }
+                    }
+                }
+
+                // Find safe stones and add to h3 value
+                List<int[]> safeStones = findSafeFlippableStones(state, currentPlayer, opponent);
+                h3Value += safeStones.size() * 8; // Add 8 points for each safe stone
+            }
+        }
+
+        // Combine all the calculated values
+        int baseValue = playerCount - opponentCount; // Difference in the number of stones
+        int positionalValue = currentCountInSides - opponentCountInSides; // Positional value
+        int totalValue = baseValue + positionalValue + h3Value;
+
+        // Return the value based on whether the player is maximizing or minimizing
+        return isMaximizingPlayer ? totalValue : -totalValue;
+    }
+
+    public static List<int[]> findSafeFlippableStones(char[][] board, char myStone, char opponentStone) {
+        List<int[]> safeStones = new ArrayList<>();
+        int[] rowDir = { 0, 0, 1, -1, 1, -1, 1, -1 };
+        int[] colDir = { 1, -1, 0, 0, 1, 1, -1, -1 };
+
+        // Iterate through the board to find safe stones
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if (board[i][j] == myStone) { // Check only the current player's stones
+                    boolean isSafe = true;
+
+                    // Check the neighbors of the stone
+                    for (int d = 0; d < 8; d++) {
+                        int r = i + rowDir[d];
+                        int c = j + colDir[d];
+
+                        // If a neighboring position has the opponent's stone, it's not safe
+                        if (r >= 0 && r < SIZE && c >= 0 && c < SIZE && board[r][c] == opponentStone) {
+                            isSafe = false;
+                            break;
+                        }
+                    }
+
+                    // If the stone is safe, add its position to the list
+                    if (isSafe) {
+                        safeStones.add(new int[] { i, j });
+                    }
+                }
+            }
+        }
+
+        return safeStones;
+    }
+
+    public static boolean isEdgeOrCorner(int i, int j) {
+        return i == 0 || i == SIZE - 1 || j == 0 || j == SIZE - 1 ||
+                i == 1 || i == SIZE - 2 || j == 1 || j == SIZE - 2;
+    }
 
     public static List<int[]> actions(char[][] state) {
         List<int[]> validActions = new ArrayList<>();
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
                 if (state[i][j] == '.' && isValidMove(i, j)) {
-                    validActions.add(new int[]{i, j});
-                    System.out.println("Valid action: " + i + ", " + j);
-
+                    validActions.add(new int[] { i, j });
+                    // System.out.println("Valid action: " + i + ", " + j);
                 }
             }
         }
         return validActions;
     }
-    
-    
 
     public static char[][] result(char[][] state, int[] action) {
         char[][] newState = copyBoard(state);
@@ -461,7 +673,8 @@ public class Othello {
 
         for (int rowStep = -1; rowStep <= 1; rowStep++) {
             for (int colStep = -1; colStep <= 1; colStep++) {
-                if (rowStep == 0 && colStep == 0) continue;
+                if (rowStep == 0 && colStep == 0)
+                    continue;
                 if (isValidDirectionOnState(newState, row, col, rowStep, colStep)) {
                     flipPiecesOnState(newState, row, col, rowStep, colStep);
                 }
