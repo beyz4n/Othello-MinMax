@@ -3,11 +3,11 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Othello {
-    static final int SIZE = 8;
-    static char[][] board = new char[SIZE][SIZE];
-    static char currentPlayer = 'X';
-    static String heuristic = "h1";
-    static int numberOfPlies = 5; // default depth is 5
+    private static final int SIZE = 8;
+    private static char[][] board = new char[SIZE][SIZE];
+    private static char currentPlayer = 'X';
+    private static String heuristic = "h1";
+    private static int numberOfPlies = 5; // default depth is 5
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -241,7 +241,6 @@ public class Othello {
         }
         return count;
     }
-    
 
     public static void initializeBoard() {
         for (int i = 0; i < SIZE; i++) {
@@ -256,17 +255,6 @@ public class Othello {
     }
 
     public static void printBoard() {
-        System.out.print("  a b c d e f g h\n");
-        for (int i = 0; i < SIZE; i++) {
-            System.out.print((i + 1) + " ");
-            for (int j = 0; j < SIZE; j++) {
-                System.out.print(board[i][j] + " ");
-            }
-            System.out.println();
-        }
-    }
-
-    public static void printBoard2(char[][] board) {
         System.out.print("  a b c d e f g h\n");
         for (int i = 0; i < SIZE; i++) {
             System.out.print((i + 1) + " ");
@@ -359,7 +347,6 @@ public class Othello {
 
         for (int[] action : actions(state)) {
             char[][] newState = result(state, action);
-            printBoard2(newState);
             int value = minValue(newState, alpha, beta, depth - 1);
             if (value > bestValue) {
                 bestValue = value;
@@ -370,14 +357,14 @@ public class Othello {
     }
 
     public static int maxValue(char[][] state, int alpha, int beta, int depth) {
-        boolean isMaximazingPlayer = true;
+        boolean isMaximizingPlayer = true;
         if (isTerminal(state) || depth == 0) {
             if (heuristic.equals("h1")) {
                 return h1(state);
             } else if (heuristic.equals("h2")) {
-                return h2(state, isMaximazingPlayer, currentPlayer);
+                return h2(state, isMaximizingPlayer, currentPlayer);
             } else if (heuristic.equals("h3")) {
-                return h3(state, isMaximazingPlayer);
+                return h3(state, isMaximizingPlayer);
             }
 
         }
@@ -394,15 +381,15 @@ public class Othello {
     }
 
     public static int minValue(char[][] state, int alpha, int beta, int depth) {
-        boolean isMaximazingPlayer = false;
+        boolean isMaximizingPlayer = false;
 
         if (isTerminal(state) || depth == 0) {
             if (heuristic.equals("h1")) {
                 return h1(state);
             } else if (heuristic.equals("h2")) {
-                return h2(state, isMaximazingPlayer, currentPlayer);
+                return h2(state, isMaximizingPlayer, currentPlayer);
             } else if (heuristic.equals("h3")) {
-                return h3(state, isMaximazingPlayer);
+                return h3(state, isMaximizingPlayer);
             }
         }
         int v = Integer.MAX_VALUE;
@@ -440,7 +427,7 @@ public class Othello {
         return playerCount - opponentCount;
     }
 
-    public static int h2(char[][] state, boolean isMaximazingPlayer, char currentPlayer) {
+    public static int h2(char[][] state, boolean isMaximizingPlayer, char currentPlayer) {
 
         int playedMoves = playedMovesCount(state);
         int playerCount = 0, opponentCount = 0;
@@ -481,14 +468,14 @@ public class Othello {
         int baseValue = playerCount - opponentCount;
         int h2Value = currentCountInSides - opponentCountInSides;
 
-        if (isMaximazingPlayer) {
+        if (isMaximizingPlayer) {
             return baseValue + h2Value;
         } else {
             return -(baseValue + h2Value);
         }
     }
 
-    private static int playedMovesCount(char[][] state) {
+    public static int playedMovesCount(char[][] state) {
 
         int playedMoves = 0;
 
@@ -502,7 +489,7 @@ public class Othello {
         return playedMoves;
     }
 
-    private static boolean isCorner(int i, int j) {
+    public static boolean isCorner(int i, int j) {
         return (i == 0 && j == 0) || (i == 0 && j == SIZE - 1) || (i == SIZE - 1 && j == 0)
                 || (i == SIZE - 1 && j == SIZE - 1);
     }
