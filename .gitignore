@@ -20,6 +20,8 @@ bin/
 
 src/ui
 
+src/Othello.class
+
 
 ### NetBeans ###
 /nbproject/private/
