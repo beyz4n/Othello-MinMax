@@ -110,7 +110,7 @@ public class OthelloGame {
 
     }
 
-    public void playHumanVsHuman() {
+    public static void playHumanVsHuman() {
         char[][] board = initializeBoard();
         printBoard(board);
 
@@ -268,7 +268,7 @@ public class OthelloGame {
         return validMoves;
     }
 
-    public  void playHumanVsAI() {
+    public static void playHumanVsAI() {
         char[][] board = initializeBoard();
         printBoard(board);
     
@@ -348,7 +348,7 @@ public class OthelloGame {
         }
     }
     
-    public int[] findBestMove(char[][] board, char player1) {
+    public static int[] findBestMove(char[][] board, char player1) {
         int bestScore = Integer.MIN_VALUE;
         int[] bestMove = null;
 
@@ -370,7 +370,7 @@ public class OthelloGame {
 
 
 
-public int minimax(char[][] board, int depth, boolean isMaximizing, char player1, int alpha, int beta) {
+public static int minimax(char[][] board, int depth, boolean isMaximizing, char player1, int alpha, int beta) {
     if (isGameOver(board, player1) || depth == numberOfPlies) {
         if (heuristic == 1) {
             return h1(board, player1);
@@ -626,7 +626,7 @@ public int minimax(char[][] board, int depth, boolean isMaximizing, char player1
 
 
 
-public void playAIVsAI() {
+public static void playAIVsAI() {
     char[][] board = initializeBoard();
     printBoard(board);
 
