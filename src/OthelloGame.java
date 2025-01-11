@@ -92,9 +92,7 @@ public class OthelloGame {
                     continue;
                 }
             }
-            System.out.println("Game Method: " + gameMethod);
-            System.out.println("Heuristic: " + heuristic);
-            System.out.println("Number of Plies: " + numberOfPlies);
+
 
             if(gameMethod == 1) {
                 OthelloGame game = new OthelloGame();
