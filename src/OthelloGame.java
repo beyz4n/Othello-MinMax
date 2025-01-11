@@ -375,9 +375,11 @@ public int minimax(char[][] board, int depth, boolean isMaximizing, char player1
         if (heuristic == 1) {
             return h1(board, player1);
         } else if (heuristic == 2) {
-            //return h2(state, isMaximizingPlayer, currentPlayer);
+           printBoard(board);
+            return h2(board, isMaximizing, player1);
         } else if (heuristic == 3) {
-           // return h3(state, isMaximizingPlayer);
+            printBoard(board);
+            return h3(board, isMaximizing,player1);
         }
     }
     char player2 = player1 == 'X' ? 'O' : 'X';
@@ -390,12 +392,14 @@ public int minimax(char[][] board, int depth, boolean isMaximizing, char player1
             System.out.println("board in minimax player 1 -- player " + player1);
             printBoard(tempBoard);
             int eval = minimax(tempBoard, depth + 1, false, player1, alpha, beta);
+            System.out.println("Evaluations are in max:" + eval);
             maxEval = Math.max(maxEval, eval);
             alpha = Math.max(alpha, eval);
             if (beta <= alpha) {
                 break;
             }
         }
+        System.out.println("Heloooo max evaluetion is:" + maxEval);
         return maxEval;
     } else { // player2
         int minEval = Integer.MAX_VALUE;
@@ -413,6 +417,214 @@ public int minimax(char[][] board, int depth, boolean isMaximizing, char player1
         return minEval;
     }
 }
+
+
+    public static int h2(char[][] state, boolean isMaximizingPlayer, char currentPlayer) {
+
+        System.out.println("Current player in h2" + currentPlayer);
+        int playedMoves = playedMovesCount(state);
+        System.out.println("Played moves count:" + playedMoves);
+        int playerCount = 0, opponentCount = 0;
+        int opponentCountInSides = 0;
+        int currentCountInSides = 0;
+        char opponent = (currentPlayer == 'X') ? 'O' : 'X';
+
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if (state[i][j] == currentPlayer) {
+                    playerCount++;
+                } else if (state[i][j] == opponent) {
+                    opponentCount++;
+                }
+
+                if (i == 0 || i == SIZE - 1 || j == 0 || j == SIZE - 1 || i == 1 || i == SIZE - 2 || j == 1
+                        || j == SIZE - 2) {
+
+                    if (playedMoves < 16) {
+
+                        if (state[i][j] == opponent) {
+                            opponentCountInSides += (isCorner(i, j) ? 3 : 2);
+                        } else if (state[i][j] == currentPlayer) {
+                            currentCountInSides += (isCorner(i, j) ? 4 : 2);
+                        }
+                    } else {
+                        if (state[i][j] == opponent) {
+                            opponentCountInSides += (isCorner(i, j) ? 4 : 2);
+                        } else if (state[i][j] == currentPlayer) {
+                            currentCountInSides += (isCorner(i, j) ? 10 : 2);
+                        }
+                    }
+
+                }
+            }
+        }
+
+        int baseValue = playerCount - opponentCount;
+        int h2Value = currentCountInSides - opponentCountInSides;
+
+        if (isMaximizingPlayer) {
+            System.out.println("Calculated value in h2 for maximizing player is:" + (baseValue+h2Value));
+            return baseValue + h2Value;
+        } else {
+            System.out.println("Calculated value in h2 for minimazing player is:" + (-baseValue-h2Value));
+            return -(baseValue + h2Value);
+        }
+    }
+
+
+    public static int playedMovesCount(char[][] state) {
+
+        int playedMoves = 0;
+
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if (state[i][j] != '.') {
+                    playedMoves++;
+                }
+            }
+        }
+        return playedMoves;
+    }
+
+    public static boolean isCorner(int i, int j) {
+        return (i == 0 && j == 0) || (i == 0 && j == SIZE - 1) || (i == SIZE - 1 && j == 0)
+                || (i == SIZE - 1 && j == SIZE - 1);
+    }
+
+
+    public static int h3(char[][] state, boolean isMaximizingPlayer, char currentPlayer) {
+
+        System.out.println("Current player in h3 " + currentPlayer);
+        int playedMoves = playedMovesCount(state);
+        int playerCount = 0, opponentCount = 0;
+        int h3Value = 0;
+        int opponentCountInSides = 0, currentCountInSides = 0;
+        char opponent = (currentPlayer == 'X') ? 'O' : 'X';
+        System.out.println("Opponent player in h3 " + opponent);
+        int safeStones = 0;
+        // Iterate through the board to calculate player stones and positional values
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if (state[i][j] == currentPlayer) {
+                    playerCount++; // Count current player's stones
+                } else if (state[i][j] == opponent) {
+                    opponentCount++; // Count opponent's stones
+                }
+
+                // Evaluate edge and corner positions
+                if (isEdgeOrCorner(i, j)) {
+                    if (playedMoves < 16) { // Early game
+                        if (state[i][j] == opponent) {
+                            opponentCountInSides += (isCorner(i, j) ? 3 : 2);
+                        } else if (state[i][j] == currentPlayer) {
+                            currentCountInSides += (isCorner(i, j) ? 4 : 2);
+                        }
+                    } else { // Late game
+                        if (state[i][j] == opponent) {
+                            opponentCountInSides += (isCorner(i, j) ? 4 : 2);
+                        } else if (state[i][j] == currentPlayer) {
+                            currentCountInSides += (isCorner(i, j) ? 10 : 2);
+                        }
+                    }
+                }
+
+                // Find safe stones and add to h3 value
+                int numberOfSafeStones = findSafeFlippableStones(state, currentPlayer, opponent, i,j);
+
+                if(numberOfSafeStones > safeStones) {
+                    safeStones = numberOfSafeStones;
+                }
+
+            }
+        }
+
+        h3Value += safeStones * 2; // Add 8 points for each safe stone
+        System.out.println("NUMBER OF SAFE STONES ARE:  " + safeStones);
+        System.out.println("h3 value is: " + h3Value);
+
+        // Combine all the calculated values
+        int baseValue = playerCount - opponentCount; // Difference in the number of stones
+        int positionalValue = currentCountInSides - opponentCountInSides; // Positional value
+        int totalValue = baseValue + positionalValue + h3Value;
+
+        // Return the value based on whether the player is maximizing or minimizing
+        return isMaximizingPlayer ? totalValue : -totalValue;
+    }
+
+
+    public static int  findSafeFlippableStones(char[][] board, char myStone, char opponentStone, int i, int j) {
+        int rows = board.length;
+        int cols = board[0].length;
+        int maxFlippedStones = 0;
+
+        int[] rowDir = {0, 0, 1, -1, 1, -1, 1, -1};
+        int[] colDir = {1, -1, 0, 0, 1, 1, -1, -1};
+
+
+        if (board[i][j] == myStone) {
+
+            int flippedStones = 0;
+
+            for (int d = 0; d < 8; d++) {
+                int currentFlips = 0;
+                int r = i + rowDir[d];
+                int c = j + colDir[d];
+
+                while (r >= 0 && r < rows && c >= 0 && c < cols && board[r][c] == opponentStone) {
+                    currentFlips++;
+                    r += rowDir[d];
+                    c += colDir[d];
+                }
+
+
+                    if (r >= 0 && r < rows && c >= 0 && c < cols && board[r][c] == '.' && currentFlips != 0) {
+                        int rnew = r + rowDir[d];
+                        int cnew = c + colDir[d];
+                        int rnew2 = i - rowDir[d];
+                        int cnew2 = j - colDir[d];
+
+                        if ((rnew >= 0 && rnew < rows && cnew >= 0 && cnew < cols) && (board[rnew][cnew] != opponentStone || isEdgeOrCorner2ForH3(r,c))
+                        || notInTheTable(rnew,cnew)) {
+                            if ((rnew2 >= 0 && rnew2 < rows && cnew2 >= 0 && cnew2 < cols) && (board[rnew2][cnew2] != opponentStone || isEdgeOrCorner2ForH3(r,c))
+                                    || notInTheTable(rnew2,cnew2)    )
+                            {
+                                        flippedStones = currentFlips;
+                                    }
+                                }
+
+                        if (flippedStones > maxFlippedStones) {
+                            maxFlippedStones = flippedStones;
+                        }
+                    }
+
+            }
+
+        }
+        return maxFlippedStones;
+    }
+
+
+
+    public static boolean notInTheTable(int row, int col) {
+        return row < 0 || row >= SIZE || col < 0 || col >= SIZE;
+    }
+
+    public static boolean isEdgeOrCorner(int i, int j) {
+        return i == 0 || i == SIZE - 1 || j == 0 || j == SIZE - 1 ||
+                i == 1 || i == SIZE - 2 || j == 1 || j == SIZE - 2;
+    }
+
+
+
+    public static boolean isEdgeOrCorner2ForH3(int i, int j) {
+        return i == 0 || i == SIZE - 1 || j == 0 || j == SIZE - 1 ;
+    }
+
+
+
+
+
+
 
 public void playAIVsAI() {
     char[][] board = initializeBoard();
