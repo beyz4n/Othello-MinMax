@@ -8,6 +8,8 @@ public class OthelloGame {
     private static int heuristic_AI1 = 1;
     private static int heuristic_AI2 = 1;
     private static int numberOfPlies = 5;
+    private static int depth_AI1 = 5;
+    private static int depth_AI2 = 5;
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -78,7 +80,7 @@ public class OthelloGame {
 
             }
 
-            if(gameMethod != 1) {
+            if(gameMethod == 2) {
 
                 System.out.println("Please select the number of plies you want to use");
                 try {
@@ -92,6 +94,34 @@ public class OthelloGame {
                     continue;
                 }
             }
+
+            if(gameMethod == 3) {
+
+                System.out.println("Please select the number of plies you want to use for AI 1");
+                try {
+                    depth_AI1 = Integer.parseInt(scanner.nextLine());
+                    if (depth_AI1 < 1) {
+                        System.out.println("Invalid input");
+                        continue;
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid input");
+                    continue;
+                }
+
+                System.out.println("Please select the number of plies you want to use for AI 2");
+                try {
+                    depth_AI2 = Integer.parseInt(scanner.nextLine());
+                    if (depth_AI2 < 1) {
+                        System.out.println("Invalid input");
+                        continue;
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid input");
+                    continue;
+                }
+            }
+
 
 
             if(gameMethod == 1) {
@@ -339,6 +369,18 @@ public class OthelloGame {
                 if (!aiMoves.isEmpty()) {
                     
                     int[] bestMove = findBestMove(board, player);
+                    if(bestMove == null){
+                        // Switch players
+                        System.out.println("AI has no valid moves.");
+                        player = player == 'X' ? 'O' : 'X';
+
+                        char opponent= player == 'X' ? 'O' : 'X';
+                        if (isGameOver(board, player) && isGameOver(board, opponent)) {
+                            break;
+                }
+
+                        continue;
+                    }
                     board = makeMove(board, player, bestMove[0], bestMove[1]);
                     System.out.println("AI moves to: " + (char) ('a' + bestMove[1]) + " " + (bestMove[0] + 1));
                     printBoard(board);
@@ -348,6 +390,11 @@ public class OthelloGame {
                         break;
                     }
                 } else {
+                    
+                    char opponent = player=='X'? 'O' : 'X';
+                    if (isGameOver(board, player) && isGameOver(board, opponent)) {
+                        break;
+                    }
                     System.out.println("AI has no valid moves.");
                 }
             }
@@ -377,7 +424,7 @@ public class OthelloGame {
     }
     
     public static int[] findBestMove(char[][] board, char player1) {
-        int bestScore = Integer.MIN_VALUE;
+        long bestScore = Integer.MIN_VALUE;
         int[] bestMove = null;
 
     
@@ -386,7 +433,7 @@ public class OthelloGame {
             tempBoard = makeMove(tempBoard, player1, move[0], move[1]);
             System.out.println("board in find best move");
             printBoard(tempBoard);
-            int score = minimax(tempBoard, 0, false, player1, Integer.MIN_VALUE, Integer.MAX_VALUE);
+            long score = minimax(tempBoard, 0, false, player1, Integer.MIN_VALUE, Integer.MAX_VALUE);
             if (score > bestScore) {
                 bestScore = score;
                 bestMove = move;
@@ -398,47 +445,47 @@ public class OthelloGame {
 
 
 
-public static int minimax(char[][] board, int depth, boolean isMaximizing, char player1, int alpha, int beta) {
+public static long minimax(char[][] board, int depth, boolean isMaximizing, char player1, long alpha, long beta) {
     char player2 = player1 == 'X' ? 'O' : 'X';
 
     if ((isGameOver(board, player1) && isGameOver(board, player2))|| depth == numberOfPlies) {
         if (heuristic == 1) {
-            printBoard(board);
+            // printBoard(board);
             return h1(isMaximizing,board, player1);
         } else if (heuristic == 2) {
-           printBoard(board);
+        //    printBoard(board);
             return h2(board, isMaximizing, player1);
         } else if (heuristic == 3) {
-            printBoard(board);
+            // printBoard(board);
             return h3(board, isMaximizing,player1);
         }
     }
 
 
     if (isMaximizing) { //player1
-        int maxEval = Integer.MIN_VALUE;
+        long maxEval = Integer.MIN_VALUE;
         for (int[] move : getValidMoves(board, player1)) {
             char[][] tempBoard = copyBoard(board);
             tempBoard = makeMove(tempBoard, player1, move[0], move[1]);
-            System.out.println("board in minimax player 1 -- player " + player1);
-            printBoard(tempBoard);
-            int eval = minimax(tempBoard, depth + 1, false, player1, alpha, beta);
-            System.out.println("Evaluations are in max:" + eval);
+            // System.out.println("board in minimax player 1 -- player " + player1);
+            // printBoard(tempBoard);
+            long eval = minimax(tempBoard, depth + 1, false, player1, alpha, beta);
+            // System.out.println("Evaluations are in max:" + eval);
             maxEval = Math.max(maxEval, eval);
             alpha = Math.max(alpha, eval);
             if (beta <= alpha) {
                 break;
             }
         }
-        System.out.println("Hello max evaluation is:" + maxEval);
+        // System.out.println("Hello max evaluation is:" + maxEval);
         return maxEval;
     } else { // player2
-        int minEval = Integer.MAX_VALUE;
+        long minEval = Integer.MAX_VALUE;
         for (int[] move : getValidMoves(board, player2)) {
             char[][] tempBoard = copyBoard(board);
             tempBoard = makeMove(tempBoard, player2, move[0], move[1]);
-            System.out.println("board in minimax player 2 -- player " + player2);
-            int eval = minimax(tempBoard, depth + 1, true, player1,  alpha, beta);
+            // System.out.println("board in minimax player 2 -- player " + player2);
+            long eval = minimax(tempBoard, depth + 1, true, player1,  alpha, beta);
             minEval = Math.min(minEval, eval);
             beta = Math.min(beta, eval);
             if (beta <= alpha) {
@@ -450,11 +497,11 @@ public static int minimax(char[][] board, int depth, boolean isMaximizing, char 
 }
 
 
-    public static int h2(char[][] state, boolean isMaximizingPlayer, char currentPlayer) {
+    public static long h2(char[][] state, boolean isMaximizingPlayer, char currentPlayer) {
 
-        System.out.println("Current player in h2" + currentPlayer);
+        // System.out.println("Current player in h2" + currentPlayer);
         int playedMoves = playedMovesCount(state);
-        System.out.println("Played moves count:" + playedMoves);
+        // System.out.println("Played moves count:" + playedMoves);
         int playerCount = 0, opponentCount = 0;
         int opponentCountInSides = 0;
         int currentCountInSides = 0;
@@ -490,16 +537,18 @@ public static int minimax(char[][] board, int depth, boolean isMaximizing, char 
             }
         }
 
-        int baseValue = playerCount - opponentCount;
-        int h2Value = currentCountInSides - opponentCountInSides;
+        long baseValue = playerCount - opponentCount;
+        long h2Value = currentCountInSides - opponentCountInSides;
 
-        if (isMaximizingPlayer) {
-            System.out.println("Calculated value in h2 for maximizing player is:" + (baseValue+h2Value));
-            return baseValue + h2Value;
-        } else {
-            System.out.println("Calculated value in h2 for minimizing player is:" + (-baseValue-h2Value));
-            return -(baseValue + h2Value);
-        }
+        return baseValue + h2Value;
+
+        // if (isMaximizingPlayer) {
+        //     System.out.println("Calculated value in h2 for maximizing player is:" + (baseValue+h2Value));
+        //     return baseValue + h2Value;
+        // } else {
+        //     System.out.println("Calculated value in h2 for minimizing player is:" + (-baseValue-h2Value));
+        //     return -(baseValue + h2Value);
+        // }
     }
 
 
@@ -662,8 +711,10 @@ public static void playAIVsAI() {
     printBoard(board);
 
     char player = 'X';
-    heuristic = heuristic_AI1;
     // AI player1 X and AI player2 O
+
+    heuristic = heuristic_AI1;
+    numberOfPlies = depth_AI1;
 
     while (true) {
         System.out.println("AI (Player " + player + ")'s turn.");
@@ -673,7 +724,20 @@ public static void playAIVsAI() {
         }
 
         if (!aiMoves.isEmpty()) {
+            
             int[] bestMove = findBestMove(board, player);
+            if(bestMove == null){
+                // Switch players
+                System.out.println("AI (Player " + player + ") has no valid moves.");
+                player = player == 'X' ? 'O' : 'X';
+                heuristic = player == 'X' ? heuristic_AI1 : heuristic_AI2;
+                numberOfPlies = player == 'X' ? depth_AI1 : depth_AI2;
+                char opponent= player == 'X' ? 'O' : 'X';
+                if (isGameOver(board, player) && isGameOver(board, opponent)) {
+                    break;
+                }
+                continue;
+            }
             board = makeMove(board, player, bestMove[0], bestMove[1]);
             System.out.println("AI (Player " + player + ") moves to: " + (char) ('a' + bestMove[1]) + " " + (bestMove[0] + 1));
             printBoard(board);
@@ -682,12 +746,17 @@ public static void playAIVsAI() {
                 break;
             }
         } else {
+            char opponent= player == 'X' ? 'O' : 'X';
+            if (isGameOver(board, player) && isGameOver(board, opponent)) {
+                break;
+            }
             System.out.println("AI (Player " + player + ") has no valid moves.");
         }
 
         // Switch players
         player = player == 'X' ? 'O' : 'X';
         heuristic = player == 'X' ? heuristic_AI1 : heuristic_AI2;
+        numberOfPlies = player == 'X' ? depth_AI1 : depth_AI2;
       
     }
 
@@ -712,8 +781,8 @@ public static void playAIVsAI() {
 
 
 
-    public static int h1(boolean isMaximizingPlayer, char[][] state, char currentPlayer) {
-        int playerCount = 0, opponentCount = 0;
+    public static long h1(boolean isMaximizingPlayer, char[][] state, char currentPlayer) {
+        long playerCount = 0, opponentCount = 0;
         char opponent = (currentPlayer == 'X') ? 'O' : 'X';
 
         for (int i = 0; i < SIZE; i++) {
@@ -725,14 +794,15 @@ public static void playAIVsAI() {
                 }
             }
         }
+        return playerCount - opponentCount;
 
-        if (isMaximizingPlayer) {
-            System.out.println("Calculated value in h2 for maximizing player is:" + (playerCount - opponentCount));
-            return playerCount - opponentCount;
-        } else {
-            System.out.println("Calculated value in h2 for minimizing player is:" + (-playerCount + opponentCount));
-            return -(playerCount - opponentCount);
-        }
+        // if (isMaximizingPlayer) {
+        //     System.out.println("Calculated value in h2 for maximizing player is:" + (playerCount - opponentCount));
+        //     return playerCount - opponentCount;
+        // } else {
+        //     System.out.println("Calculated value in h2 for minimizing player is:" + (-playerCount + opponentCount));
+        //     return -(playerCount - opponentCount);
+        // }
 
     }
 
