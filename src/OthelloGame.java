@@ -148,17 +148,17 @@ public class OthelloGame {
         }
 
         // Game over, determine the winner
-        int countofX = countStones(board, 'X');
-        int countofO = countStones(board, 'O');
+        int countOfX = countStones(board, 'X');
+        int countOfO = countStones(board, 'O');
 
         System.out.println("Game Over!");
         System.out.println("Final Score: ");
-        System.out.println("Player X: " + countofX);
-        System.out.println("Player O: " + countofO);
+        System.out.println("Player X: " + countOfX);
+        System.out.println("Player O: " + countOfO);
 
-        if (countofX > countofO) {
+        if (countOfX > countOfO) {
             System.out.println("Player 1 (X) wins!");
-        } else if (countofO > countofX) {
+        } else if (countOfO > countOfX) {
             System.out.println("Player 2 (O) wins!");
         } else {
             System.out.println("It's a draw!");
@@ -399,7 +399,7 @@ public static int minimax(char[][] board, int depth, boolean isMaximizing, char 
                 break;
             }
         }
-        System.out.println("Heloooo max evaluetion is:" + maxEval);
+        System.out.println("Hello max evaluation is:" + maxEval);
         return maxEval;
     } else { // player2
         int minEval = Integer.MAX_VALUE;
@@ -466,7 +466,7 @@ public static int minimax(char[][] board, int depth, boolean isMaximizing, char 
             System.out.println("Calculated value in h2 for maximizing player is:" + (baseValue+h2Value));
             return baseValue + h2Value;
         } else {
-            System.out.println("Calculated value in h2 for minimazing player is:" + (-baseValue-h2Value));
+            System.out.println("Calculated value in h2 for minimizing player is:" + (-baseValue-h2Value));
             return -(baseValue + h2Value);
         }
     }
