@@ -118,29 +118,44 @@ public class OthelloGame {
 
         Scanner scanner = new Scanner(System.in);
         while (true) {
+
             System.out.println("Player " + player + "'s turn.");
-            System.out.println("Enter column (a-h) and row (1-8):");
-            String input = scanner.nextLine();
-            String[] parts = input.split(" ");
-            char colChar = parts[0].charAt(0);
-
-            int row = Integer.parseInt(parts[1]) - 1;
-            int col = colChar - 'a';
-
-            System.out.println("Row: " + row + ", Column: " + col);
 
             List<int[]> moves = getValidMoves(board, player);
-            for (int[] move : moves) System.out.println("Valid move: " + (char) ('a' + move[1]) + " " + (move[0] + 1));
-            if(isValidMove(board, player, row, col)) {
 
-                board = makeMove(board, player, row, col);
-                printBoard(board);
+            if (!moves.isEmpty()) {
+                System.out.println("Enter column (a-h) and row (1-8):");
+                String input = scanner.nextLine();
+                String[] parts = input.split(" ");
+                char colChar = parts[0].charAt(0);
 
-                if(isGameOver(board, player)) {
+                int row = Integer.parseInt(parts[1]) - 1;
+                int col = colChar - 'a';
+
+                System.out.println("Row: " + row + ", Column: " + col);
+
+
+                for (int[] move : moves)
+                    System.out.println("Valid move: " + (char) ('a' + move[1]) + " " + (move[0] + 1));
+                if (isValidMove(board, player, row, col)) {
+
+                    board = makeMove(board, player, row, col);
+                    printBoard(board);
+                    char opponent = player == 'X' ? 'O' : 'X';
+                    if (isGameOver(board, player) && isGameOver(board, opponent)) {
+                        break;
+                    }
+
+                    player = player == 'X' ? 'O' : 'X';
+
+                }
+            }
+            else{
+                char opponent = player == 'X' ? 'O' : 'X';
+                if (isGameOver(board, player) && isGameOver(board, opponent)) {
                     break;
                 }
-
-                player = player == 'X' ? 'O' : 'X';
+                System.out.println("Player " + player + " has no valid moves.");
 
             }
 
@@ -232,6 +247,7 @@ public class OthelloGame {
     }
 
     public static boolean isGameOver(char[][] board, char player) {
+
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
                 if (isValidMove(board, player, i, j)) {
@@ -278,7 +294,11 @@ public class OthelloGame {
         Scanner scanner = new Scanner(System.in);
         while (true) {
             if (player == 'X') {
+
+                List<int[]> moves = getValidMoves(board, player);
+
                 System.out.println("Player (Human) " + player + "'s turn.");
+                if (!moves.isEmpty()) {
                 System.out.println("Enter column (a-h) and row (1-8):");
                 String input = scanner.nextLine();
                 String[] parts = input.split(" ");
@@ -289,23 +309,32 @@ public class OthelloGame {
     
                 System.out.println("Row: " + row + ", Column: " + col);
     
-                List<int[]> moves = getValidMoves(board, player);
+
                 for (int[] move : moves) {
                     System.out.println("Valid move: " + (char) ('a' + move[1]) + " " + (move[0] + 1));
                 }
-    
+
                 if (isValidMove(board, player, row, col)) {
                     board = makeMove(board, player, row, col);
                     printBoard(board);
-    
-                    if (isGameOver(board, player)) {
+                    char opponent = player=='X'? 'O' : 'X';
+                    if (isGameOver(board, player) && isGameOver(board,opponent)) {
                         break;
                     }
                 } else {
                     System.out.println("Invalid move. Try again.");
                     continue;
                 }
-            } else {
+            }
+                else{
+                    char opponent = player=='X'? 'O' : 'X';
+                    if (isGameOver(board, player) && isGameOver(board,opponent)) {
+                        break;
+                    }
+                    System.out.println("Human player has no valid moves.");
+                }
+            }
+            else {
                 System.out.println("AI (Player " + player + ")'s turn.");
                 List<int[]> aiMoves = getValidMoves(board, player);
                 for (int[] move : aiMoves) System.out.println("Valid move: " + (char) ('a' + move[1]) + " " + (move[0] + 1));
@@ -315,8 +344,9 @@ public class OthelloGame {
                     board = makeMove(board, player, bestMove[0], bestMove[1]);
                     System.out.println("AI moves to: " + (char) ('a' + bestMove[1]) + " " + (bestMove[0] + 1));
                     printBoard(board);
-    
-                    if (isGameOver(board, player)) {
+
+                    char opponent = player=='X'? 'O' : 'X';
+                    if (isGameOver(board, player) && isGameOver(board, opponent)) {
                         break;
                     }
                 } else {
@@ -371,7 +401,9 @@ public class OthelloGame {
 
 
 public static int minimax(char[][] board, int depth, boolean isMaximizing, char player1, int alpha, int beta) {
-    if (isGameOver(board, player1) || depth == numberOfPlies) {
+    char player2 = player1 == 'X' ? 'O' : 'X';
+
+    if ((isGameOver(board, player1) && isGameOver(board, player2))|| depth == numberOfPlies) {
         if (heuristic == 1) {
             return h1(board, player1);
         } else if (heuristic == 2) {
@@ -382,7 +414,7 @@ public static int minimax(char[][] board, int depth, boolean isMaximizing, char 
             return h3(board, isMaximizing,player1);
         }
     }
-    char player2 = player1 == 'X' ? 'O' : 'X';
+
 
     if (isMaximizing) { //player1
         int maxEval = Integer.MIN_VALUE;
@@ -646,8 +678,8 @@ public static void playAIVsAI() {
             board = makeMove(board, player, bestMove[0], bestMove[1]);
             System.out.println("AI (Player " + player + ") moves to: " + (char) ('a' + bestMove[1]) + " " + (bestMove[0] + 1));
             printBoard(board);
-
-            if (isGameOver(board, player)) {
+            char opponent= player == 'X' ? 'O' : 'X';
+            if (isGameOver(board, player) && isGameOver(board, opponent)) {
                 break;
             }
         } else {
