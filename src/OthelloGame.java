@@ -212,6 +212,8 @@ public class OthelloGame {
 
     public static boolean isValidMove(char[][] board, char player, int row, int col) {
         if (row < 0 || row >= SIZE || col < 0 || col >= SIZE || board[row][col] != '.') {
+            if(row == 6 && col == 7)
+                System.out.println("Inside is valid move, return false.");
             return false;
         }
 
@@ -369,6 +371,7 @@ public class OthelloGame {
                 if (!aiMoves.isEmpty()) {
                     
                     int[] bestMove = findBestMove(board, player);
+                    /*
                     if(bestMove == null){
                         // Switch players
                         System.out.println("AI has no valid moves.");
@@ -381,6 +384,7 @@ public class OthelloGame {
 
                         continue;
                     }
+                    */
                     board = makeMove(board, player, bestMove[0], bestMove[1]);
                     System.out.println("AI moves to: " + (char) ('a' + bestMove[1]) + " " + (bestMove[0] + 1));
                     printBoard(board);
@@ -401,6 +405,11 @@ public class OthelloGame {
     
             // Switch players
             player = player == 'X' ? 'O' : 'X';
+
+            char opponent= player == 'X' ? 'O' : 'X';
+            if (isGameOver(board, player) && isGameOver(board, opponent)) {
+                break;
+            }
         }
 
         
@@ -438,6 +447,10 @@ public class OthelloGame {
                 bestScore = score;
                 bestMove = move;
             }
+        }
+
+        if(bestMove == null && !getValidMoves(board, player1).isEmpty()){
+            bestMove = getValidMoves(board, player1).get(0);
         }
     
         return bestMove;
@@ -726,6 +739,7 @@ public static void playAIVsAI() {
         if (!aiMoves.isEmpty()) {
             
             int[] bestMove = findBestMove(board, player);
+            /*
             if(bestMove == null){
                 // Switch players
                 System.out.println("AI (Player " + player + ") has no valid moves.");
@@ -738,6 +752,7 @@ public static void playAIVsAI() {
                 }
                 continue;
             }
+            */
             board = makeMove(board, player, bestMove[0], bestMove[1]);
             System.out.println("AI (Player " + player + ") moves to: " + (char) ('a' + bestMove[1]) + " " + (bestMove[0] + 1));
             printBoard(board);
@@ -757,7 +772,11 @@ public static void playAIVsAI() {
         player = player == 'X' ? 'O' : 'X';
         heuristic = player == 'X' ? heuristic_AI1 : heuristic_AI2;
         numberOfPlies = player == 'X' ? depth_AI1 : depth_AI2;
-      
+
+        char opponent= player == 'X' ? 'O' : 'X';
+        if (isGameOver(board, player) && isGameOver(board, opponent)) {
+            break;
+        }
     }
 
     // Game over, determine the winner
