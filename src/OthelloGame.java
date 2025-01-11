@@ -631,6 +631,7 @@ public void playAIVsAI() {
     printBoard(board);
 
     char player = 'X';
+    heuristic = heuristic_AI1;
     // AI player1 X and AI player2 O
 
     while (true) {
@@ -655,6 +656,7 @@ public void playAIVsAI() {
 
         // Switch players
         player = player == 'X' ? 'O' : 'X';
+        heuristic = player == 'X' ? heuristic_AI1 : heuristic_AI2;
       
     }
 
