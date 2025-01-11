@@ -405,7 +405,8 @@ public static int minimax(char[][] board, int depth, boolean isMaximizing, char 
 
     if ((isGameOver(board, player1) && isGameOver(board, player2))|| depth == numberOfPlies) {
         if (heuristic == 1) {
-            return h1(board, player1);
+            printBoard(board);
+            return h1(isMaximizing,board, player1);
         } else if (heuristic == 2) {
            printBoard(board);
             return h2(board, isMaximizing, player1);
@@ -713,7 +714,7 @@ public static void playAIVsAI() {
 
 
 
-    public static int h1(char[][] state, char currentPlayer) {
+    public static int h1(boolean isMaximizingPlayer, char[][] state, char currentPlayer) {
         int playerCount = 0, opponentCount = 0;
         char opponent = (currentPlayer == 'X') ? 'O' : 'X';
 
@@ -726,7 +727,15 @@ public static void playAIVsAI() {
                 }
             }
         }
-        return playerCount - opponentCount;
+
+        if (isMaximizingPlayer) {
+            System.out.println("Calculated value in h2 for maximizing player is:" + (playerCount - opponentCount));
+            return playerCount - opponentCount;
+        } else {
+            System.out.println("Calculated value in h2 for minimizing player is:" + (-playerCount + opponentCount));
+            return -(playerCount - opponentCount);
+        }
+
     }
 
     public static char[][] initializeBoard() {
