@@ -5,6 +5,8 @@ import java.util.Scanner;
 public class OthelloGame {
     private static final int SIZE = 8;
     private static int heuristic = 1;
+    private static int heuristic_AI1 = 1;
+    private static int heuristic_AI2 = 1;
     private static int numberOfPlies = 5;
 
     public static void main(String[] args) {
@@ -25,7 +27,8 @@ public class OthelloGame {
                 System.out.println("Invalid input");
                 continue;
             }
-            if(gameMethod != 1) {
+
+            if(gameMethod == 2){
                 System.out.println("Please select the heuristic you want to use");
                 System.out.println("1 for h1");
                 System.out.println("2 for h2");
@@ -40,6 +43,42 @@ public class OthelloGame {
                     System.out.println("Invalid input");
                     continue;
                 }
+            }
+
+            if(gameMethod == 3){
+                System.out.println("Please select the heuristic for AI 1");
+                System.out.println("1 for h1");
+                System.out.println("2 for h2");
+                System.out.println("3 for h3");
+                try {
+                    heuristic_AI1 = Integer.parseInt(scanner.nextLine());
+                    if (heuristic < 1 || heuristic > 3) {
+                        System.out.println("Invalid input");
+                        continue;
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid input");
+                    continue;
+                }
+
+                System.out.println("Please select the heuristic for AI 2");
+                System.out.println("1 for h1");
+                System.out.println("2 for h2");
+                System.out.println("3 for h3");
+                try {
+                    heuristic_AI2 = Integer.parseInt(scanner.nextLine());
+                    if (heuristic < 1 || heuristic > 3) {
+                        System.out.println("Invalid input");
+                        continue;
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid input");
+                    continue;
+                }
+
+            }
+
+            if(gameMethod != 1) {
 
                 System.out.println("Please select the number of plies you want to use");
                 try {
@@ -375,9 +414,56 @@ public int minimax(char[][] board, int depth, boolean isMaximizing, char player1
     }
 }
 
-    public static void playAIVsAI() {
+public void playAIVsAI() {
+    char[][] board = initializeBoard();
+    printBoard(board);
 
+    char player = 'X';
+    // AI player1 X and AI player2 O
+
+    while (true) {
+        System.out.println("AI (Player " + player + ")'s turn.");
+        List<int[]> aiMoves = getValidMoves(board, player);
+        for (int[] move : aiMoves) {
+            System.out.println("Valid move: " + (char) ('a' + move[1]) + " " + (move[0] + 1));
+        }
+
+        if (!aiMoves.isEmpty()) {
+            int[] bestMove = findBestMove(board, player);
+            board = makeMove(board, player, bestMove[0], bestMove[1]);
+            System.out.println("AI (Player " + player + ") moves to: " + (char) ('a' + bestMove[1]) + " " + (bestMove[0] + 1));
+            printBoard(board);
+
+            if (isGameOver(board, player)) {
+                break;
+            }
+        } else {
+            System.out.println("AI (Player " + player + ") has no valid moves.");
+        }
+
+        // Switch players
+        player = player == 'X' ? 'O' : 'X';
+      
     }
+
+    // Game over, determine the winner
+    int countOfX = countStones(board, 'X');
+    int countOfO = countStones(board, 'O');
+
+    System.out.println("Game Over!");
+    System.out.println("Final Score: ");
+    System.out.println("AI Player X: " + countOfX);
+    System.out.println("AI Player O: " + countOfO);
+
+    if (countOfX > countOfO) {
+        System.out.println("AI Player X wins!");
+    } else if (countOfO > countOfX) {
+        System.out.println("AI Player O wins!");
+    } else {
+        System.out.println("It's a draw!");
+    }
+}
+
 
 
 
