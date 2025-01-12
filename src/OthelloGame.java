@@ -207,8 +207,6 @@ public class OthelloGame {
 
     public static boolean isValidMove(char[][] board, char player, int row, int col) {
         if (row < 0 || row >= SIZE || col < 0 || col >= SIZE || board[row][col] != '.') {
-            if(row == 6 && col == 7)
-                System.out.println("Inside is valid move, return false.");
             return false;
         }
 
