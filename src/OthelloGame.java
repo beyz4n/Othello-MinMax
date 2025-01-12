@@ -534,13 +534,13 @@ public static long minimax(char[][] board, int depth, boolean isMaximizing, char
                     if (playedMoves < 16) {
 
                         if (state[i][j] == opponent) {
-                            opponentCountInSides += (isCorner(i, j) ? 3 : 2);
+                            opponentCountInSides += (isCorner(i, j) ? 2 : 2);
                         } else if (state[i][j] == currentPlayer) {
                             currentCountInSides += (isCorner(i, j) ? 4 : 2);
                         }
                     } else {
                         if (state[i][j] == opponent) {
-                            opponentCountInSides += (isCorner(i, j) ? 4 : 2);
+                            opponentCountInSides += (isCorner(i, j) ? 3 : 2);
                         } else if (state[i][j] == currentPlayer) {
                             currentCountInSides += (isCorner(i, j) ? 10 : 2);
                         }
@@ -553,15 +553,15 @@ public static long minimax(char[][] board, int depth, boolean isMaximizing, char
         long baseValue = playerCount - opponentCount;
         long h2Value = currentCountInSides - opponentCountInSides;
 
-        return baseValue + h2Value;
+        // return baseValue + h2Value;
 
-        // if (isMaximizingPlayer) {
-        //     System.out.println("Calculated value in h2 for maximizing player is:" + (baseValue+h2Value));
-        //     return baseValue + h2Value;
-        // } else {
-        //     System.out.println("Calculated value in h2 for minimizing player is:" + (-baseValue-h2Value));
-        //     return -(baseValue + h2Value);
-        // }
+        if (isMaximizingPlayer) {
+            System.out.println("Calculated value in h2 for maximizing player is:" + (baseValue+h2Value));
+            return baseValue + h2Value;
+        } else {
+            System.out.println("Calculated value in h2 for minimizing player is:" + (-baseValue-h2Value));
+            return -(baseValue + h2Value);
+        }
     }
 
 
@@ -813,15 +813,15 @@ public static void playAIVsAI() {
                 }
             }
         }
-        return playerCount - opponentCount;
+        // return playerCount - opponentCount;
 
-        // if (isMaximizingPlayer) {
-        //     System.out.println("Calculated value in h2 for maximizing player is:" + (playerCount - opponentCount));
-        //     return playerCount - opponentCount;
-        // } else {
-        //     System.out.println("Calculated value in h2 for minimizing player is:" + (-playerCount + opponentCount));
-        //     return -(playerCount - opponentCount);
-        // }
+        if (isMaximizingPlayer) {
+            System.out.println("Calculated value in h2 for maximizing player is:" + (playerCount - opponentCount));
+            return playerCount - opponentCount;
+        } else {
+            System.out.println("Calculated value in h2 for minimizing player is:" + (-playerCount + opponentCount));
+            return -(playerCount - opponentCount);
+        }
 
     }
 
